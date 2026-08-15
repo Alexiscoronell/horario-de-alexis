@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>parciales.log · Informática</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/parciales.js" defer></script>
+</head>
+<body>
+
+  <div class="wrap">
+    <!-- Header -->
+    <header class="term">
+      <div class="term-bar">
+        <a href="index.html" class="btn-back">← cd .. (volver)</a>
+        <div class="toggle" id="themeToggle">
+          <button id="btnDark" class="active" data-mode="dark">DARK</button>
+          <button id="btnLight" data-mode="light">LIGHT</button>
+        </div>
+      </div>
+      <div class="term-body">
+        <div><span class="prompt">$</span> ./check_exams.sh<span class="cursor"></span></div>
+        <h1>FECHAS DE PARCIALES & ENTREGAS</h1>
+        <div class="meta">Control de deadlines, entregas de laboratorio y parciales</div>
+      </div>
+    </header>
+
+    <!-- Parciales Box -->
+    <section class="parciales-box">
+      <div class="parciales-head">
+        <span>// DEADLINES REGISTRADOS</span>
+        <button class="btn-mini" id="btnToggleExamForm" type="button">+ Agregar Fecha</button>
+      </div>
+      <div class="parciales-body">
+        <!-- Formulario -->
+        <form class="parcial-form" id="examForm">
+          <div class="form-title" id="formTitle">Nuevo Deadline</div>
+          <input type="hidden" id="editExamId">
+          <div class="form-row">
+            <input type="text" id="examNameInput" class="form-input" placeholder="Ej: 1° Parcial Desarrollo de Software" required>
+            <input type="date" id="examDateInput" class="form-input" required>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-sub" id="btnCancelExam">Cancelar</button>
+            <button type="submit" class="btn-mini" style="padding:6px 14px;">Guardar</button>
+          </div>
+        </form>
+
+        <!-- Lista -->
+        <div class="exam-list" id="examList"></div>
+      </div>
+    </section>
+
+    <footer class="tip">// datos persistidos en localStorage [horario_apu_parciales]</footer>
+  </div>
+
+</body>
+</html>

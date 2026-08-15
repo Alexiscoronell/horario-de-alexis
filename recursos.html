@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+  <title>bookmarks.json · Informática</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/recursos.js" defer></script>
+</head>
+<body>
+
+  <div class="wrap">
+    <!-- Header -->
+    <header class="term">
+      <div class="term-bar">
+        <a href="index.html" class="btn-back">← cd .. (volver)</a>
+        <div class="toggle" id="themeToggle">
+          <button id="btnDark" class="active" data-mode="dark">DARK</button>
+          <button id="btnLight" data-mode="light">LIGHT</button>
+        </div>
+      </div>
+      <div class="term-body">
+        <div><span class="prompt">$</span> cd biblioteca<span class="cursor"></span></div>
+        <h1>BIBLIOTECA & ENLACES DIGITALES</h1>
+        <div class="meta">Plan de estudios, repositorios, campus y documentación</div>
+      </div>
+    </header>
+
+    <!-- Recursos Box -->
+    <section class="parciales-box">
+      <div class="parciales-head">
+        <span>// ENLACES INDEXADOS</span>
+        <button class="btn-mini" id="btnToggleRecursoForm" type="button">+ Agregar Enlace</button>
+      </div>
+      <div class="parciales-body">
+        <!-- Formulario -->
+        <form class="parcial-form" id="recursoForm">
+          <div class="form-title" id="recursoFormTitle">Nuevo Enlace</div>
+          <input type="hidden" id="editRecursoId">
+          <div class="form-row">
+            <input type="text" id="recursoNameInput" class="form-input" placeholder="Nombre (ej: Plan de Estudios UNPSJB)" required>
+          </div>
+          <div class="form-row">
+            <input type="text" id="recursoUrlInput" class="form-input" placeholder="URL (ej: plan-estudios-unpsjb.vercel.app)" required>
+          </div>
+          <div class="form-row">
+            <input type="text" id="recursoDescInput" class="form-input" placeholder="Descripción (opcional, ej: Malla curricular)">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-sub" id="btnCancelRecurso">Cancelar</button>
+            <button type="submit" class="btn-mini" style="padding:6px 14px;">Guardar</button>
+          </div>
+        </form>
+
+        <!-- Lista -->
+        <div class="links-dynamic-list" id="recursosList"></div>
+      </div>
+    </section>
+
+    <footer class="tip">// tocá cualquier tarjeta para abrir en un nuevo tab</iframe>
+  </div>
+
+</body>
+</html>
