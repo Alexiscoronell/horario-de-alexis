@@ -20,39 +20,66 @@
         </div>
       </div>
       <div class="term-body">
-        <div><span class="prompt">$</span> ./check_exams.sh<span class="cursor"></span></div>
-        <h1>FECHAS DE PARCIALES & ENTREGAS</h1>
-        <div class="meta">Control de deadlines, entregas de laboratorio y parciales</div>
+        <div><span class="prompt">$</span> ./check_exams.sh --status<span class="cursor"></span></div>
+        <h1>CONTROL DE PARCIALES & NOTAS</h1>
+        <div class="meta">Seguimiento de calificaciones, aprobados y recuperatorios</div>
       </div>
     </header>
+
+    <!-- Resumen de Métricas de Aprobación -->
+    <section class="stats-bar" id="statsBar">
+      <div class="stat-item"><span class="stat-num" id="countAprobados" style="color:var(--green);">0</span> Aprobados</div>
+      <div class="stat-item"><span class="stat-num" id="countPendientes" style="color:var(--cyan);">0</span> Pendientes</div>
+      <div class="stat-item"><span class="stat-num" id="countRecu" style="color:var(--danger);">0</span> A Recu</div>
+    </section>
 
     <!-- Parciales Box -->
     <section class="parciales-box">
       <div class="parciales-head">
-        <span>// DEADLINES REGISTRADOS</span>
-        <button class="btn-mini" id="btnToggleExamForm" type="button">+ Agregar Fecha</button>
+        <span>// DEADLINES & CALIFICACIONES</span>
+        <button class="btn-mini" id="btnToggleExamForm" type="button">+ Agregar Parcial</button>
       </div>
       <div class="parciales-body">
-        <!-- Formulario -->
+        <!-- Formulario CRUD -->
         <form class="parcial-form" id="examForm">
-          <div class="form-title" id="formTitle">Nuevo Deadline</div>
+          <div class="form-title" id="formTitle">Nuevo Registro de Parcial</div>
           <input type="hidden" id="editExamId">
+          
           <div class="form-row">
-            <input type="text" id="examNameInput" class="form-input" placeholder="Ej: 1° Parcial Desarrollo de Software" required>
+            <input type="text" id="examNameInput" class="form-input" placeholder="Nombre (ej: 1° Parcial Dev. Software)" required>
             <input type="date" id="examDateInput" class="form-input" required>
           </div>
+
+          <div class="form-row">
+            <select id="examStatusInput" class="form-input" onchange="toggleRecuFields()">
+              <option value="pendiente">⏳ Pendiente / Por rendir</option>
+              <option value="aprobado">🟢 Aprobado</option>
+              <option value="recu">🟡 A Recuperatorio</option>
+              <option value="desaprobado">🔴 Desaprobado</option>
+            </select>
+            <input type="number" step="0.5" min="1" max="10" id="examGradeInput" class="form-input" placeholder="Nota obtenida (ej: 8)">
+          </div>
+
+          <!-- Campos de Recuperatorio (Desplegables) -->
+          <div id="recuFieldsGroup" style="display:none; flex-direction:column; gap:8px;">
+            <div class="form-row">
+              <input type="date" id="examRecuDateInput" class="form-input" title="Fecha del recuperatorio">
+              <input type="number" step="0.5" min="1" max="10" id="examRecuGradeInput" class="form-input" placeholder="Nota del Recu (opcional)">
+            </div>
+          </div>
+
           <div class="form-actions">
             <button type="button" class="btn-sub" id="btnCancelExam">Cancelar</button>
             <button type="submit" class="btn-mini" style="padding:6px 14px;">Guardar</button>
           </div>
         </form>
 
-        <!-- Lista -->
+        <!-- Lista de Tarjetas -->
         <div class="exam-list" id="examList"></div>
       </div>
     </section>
 
-    <footer class="tip">// datos persistidos en localStorage [horario_apu_parciales]</footer>
+    <footer class="tip">// datos persistidos en tiempo real en localStorage</footer>
   </div>
 
 </body>

@@ -376,3 +376,79 @@ details[open] > summary .chev { transform: rotate(90deg); }
 .tip { font-size: 10.5px; color: var(--text-faint); text-align: center; margin-top: 14px; }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
+/* -------- Stats Bar -------- */
+.stats-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.stat-item {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.stat-num {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+/* -------- Sincronización Google Calendar -------- */
+.sync-card {
+  background: var(--panel-2);
+  border: 1px solid var(--cyan);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.btn-sync {
+  background: var(--cyan);
+  color: #04140a;
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 7px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(75, 227, 255, 0.3);
+  transition: transform 0.15s ease;
+}
+.btn-sync:active { transform: scale(0.96); }
+
+/* -------- Badges de Calificación y Notas -------- */
+.badge-aprobado { background: rgba(93, 255, 176, 0.15); color: var(--green); border: 1px solid var(--green); }
+.badge-recu { background: rgba(255, 189, 46, 0.15); color: #ffbd2e; border: 1px solid #ffbd2e; }
+.badge-desaprobado { background: rgba(255, 61, 99, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+
+.exam-grade-pill {
+  display: inline-block;
+  font-size: 10px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 4px;
+  color: var(--text);
+}
+.exam-grade-pill b { color: var(--accent); }
+
+.recu-notice {
+  font-size: 10.5px;
+  color: #ffbd2e;
+  margin-top: 4px;
+}
+.recu-notice b { color: var(--text); }
