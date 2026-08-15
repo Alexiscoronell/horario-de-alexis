@@ -1,293 +1,245 @@
-const LOCAL_STORAGE_KEY = 'horario_apu_parciales';
-const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+'use strict';
 
-let currentTab = 'pendientes'; // 'pendientes' | 'aprobados' | 'recus'
+(function () {
+  const { escapeHtml, delegate } = App;
+  const MONTHS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
-function getExams() {
-  try {
-    return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [
-      { id: 1, name: "1° Parcial Dev. Software", date: "2026-09-28", room: "Aula 7", status: "pendiente", grade: "", isRecu: false }
-    ];
-  } catch (e) { return []; }
-}
+  const store = App.createLocalStore('horario_apu_parciales', [
+    { id: 1, name: "1° Parcial Dev. Software", date: "2026-09-28", room: "Aula 7", status: "pendiente", grade: "", isRecu: false }
+  ]);
 
-function saveExams(exams) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(exams));
-  renderExams();
-}
+  let currentTab = 'pendientes'; // 'pendientes' | 'aprobados' | 'recus'
 
-window.switchTab = function(tab) {
-  currentTab = tab;
-  document.getElementById('tabPendientes').classList.toggle('active', tab === 'pendientes');
-  document.getElementById('tabAprobados').classList.toggle('active', tab === 'aprobados');
-  document.getElementById('tabRecu').classList.toggle('active', tab === 'recus');
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tabPendientes').classList.toggle('active', tab === 'pendientes');
+    document.getElementById('tabAprobados').classList.toggle('active', tab === 'aprobados');
+    document.getElementById('tabRecu').classList.toggle('active', tab === 'recus');
 
-  const titles = {
-    pendientes: '// PARCIALES PENDIENTES (POR RENDIR)',
-    aprobados: '// HISTORIAL DE APROBADOS',
-    recus: '// HISTORIAL DE RECUPERATORIOS Y DESAPROBADOS'
-  };
-  document.getElementById('currentViewTitle').textContent = titles[tab];
-
-  // El botón "+ Nuevo Parcial" solo es relevante en la pestaña de pendientes
-  document.getElementById('btnToggleExamForm').style.display = (tab === 'pendientes') ? 'inline-block' : 'none';
-
-  closeAllForms();
-  renderExams();
-};
-
-window.onGradeStatusChange = function() {
-  const status = document.getElementById('gradeStatusInput').value;
-  const group = document.getElementById('recuAutoGroup');
-  group.style.display = (status === 'recu') ? 'flex' : 'none';
-  if (status === 'recu') {
-    document.getElementById('autoRecuDateInput').required = true;
-  } else {
-    document.getElementById('autoRecuDateInput').required = false;
-  }
-};
-
-function updateCounters(exams) {
-  let pendientes = 0, aprobados = 0, recus = 0;
-  exams.forEach(x => {
-    if (x.status === 'aprobado') aprobados++;
-    else if (x.status === 'recu' || x.status === 'desaprobado') recus++;
-    else pendientes++;
-  });
-  document.getElementById('countPendientes').textContent = pendientes;
-  document.getElementById('countAprobados').textContent = aprobados;
-  document.getElementById('countRecus').textContent = recus;
-}
-
-function renderExams() {
-  const container = document.getElementById('examList');
-  const exams = getExams();
-  updateCounters(exams);
-
-  // Filtrar según pestaña activa
-  let filtered = [];
-  if (currentTab === 'pendientes') {
-    filtered = exams.filter(x => x.status === 'pendiente');
-  } else if (currentTab === 'aprobados') {
-    filtered = exams.filter(x => x.status === 'aprobado');
-  } else if (currentTab === 'recus') {
-    filtered = exams.filter(x => x.status === 'recu' || x.status === 'desaprobado');
-  }
-
-  filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  if (filtered.length === 0) {
-    const emptyMsgs = {
-      pendientes: '// no tenés parciales pendientes',
-      aprobados: '// todavía no registraste parciales aprobados',
-      recus: '// sin parciales en recuperatorio o desaprobados'
+    const titles = {
+      pendientes: '// PARCIALES PENDIENTES (POR RENDIR)',
+      aprobados: '// HISTORIAL DE APROBADOS',
+      recus: '// HISTORIAL DE RECUPERATORIOS Y DESAPROBADOS'
     };
-    container.innerHTML = `<div class="empty-day">${emptyMsgs[currentTab]}</div>`;
-    return;
+    document.getElementById('currentViewTitle').textContent = titles[tab];
+    document.getElementById('btnToggleExamForm').style.display = (tab === 'pendientes') ? 'inline-block' : 'none';
+
+    closeAllForms();
+    render();
   }
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  function onGradeStatusChange() {
+    const status = document.getElementById('gradeStatusInput').value;
+    const group = document.getElementById('recuAutoGroup');
+    const dateInput = document.getElementById('autoRecuDateInput');
+    const show = status === 'recu';
+    group.style.display = show ? 'flex' : 'none';
+    dateInput.required = show;
+  }
 
-  container.innerHTML = filtered.map(ex => {
-    const [y, m, d] = ex.date.split('-').map(Number);
+  function updateCounters(exams) {
+    let pendientes = 0, aprobados = 0, recus = 0;
+    exams.forEach(x => {
+      if (x.status === 'aprobado') aprobados++;
+      else if (x.status === 'recu' || x.status === 'desaprobado') recus++;
+      else pendientes++;
+    });
+    document.getElementById('countPendientes').textContent = pendientes;
+    document.getElementById('countAprobados').textContent = aprobados;
+    document.getElementById('countRecus').textContent = recus;
+  }
+
+  function daysUntil(dateStr) {
+    const [y, m, d] = dateStr.split('-').map(Number);
     const target = new Date(y, m - 1, d);
     target.setHours(0, 0, 0, 0);
-    const diffDays = Math.round((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-
-    let statusBadge = '';
-    let actionBtn = '';
-    let isRecuBadge = ex.isRecu ? `<span class="recu-tag">⚡ RECU</span>` : '';
-
-    if (ex.status === 'aprobado') {
-      statusBadge = `<span class="exam-badge badge-aprobado">🟢 APROBADO (${ex.grade})</span>`;
-      actionBtn = `<button class="btn-action-card" onclick="openGradeModal(${ex.id})">✏️ Cambiar Nota</button>`;
-    } else if (ex.status === 'recu') {
-      statusBadge = `<span class="exam-badge badge-recu">🟡 A RECU (${ex.grade})</span>`;
-      actionBtn = `<button class="btn-action-card" onclick="openGradeModal(${ex.id})">✏️ Modificar</button>`;
-    } else if (ex.status === 'desaprobado') {
-      statusBadge = `<span class="exam-badge badge-desaprobado">🔴 DESAPROBADO (${ex.grade})</span>`;
-      actionBtn = `<button class="btn-action-card" onclick="openGradeModal(${ex.id})">✏️ Modificar</button>`;
-    } else {
-      // Pendiente
-      if (diffDays === 0) statusBadge = `<span class="exam-badge badge-today">¡ES HOY!</span>`;
-      else if (diffDays === 1) statusBadge = `<span class="exam-badge badge-soon">¡MAÑANA!</span>`;
-      else if (diffDays > 1) statusBadge = `<span class="exam-badge badge-soon">Faltan ${diffDays}d</span>`;
-      else statusBadge = `<span class="exam-badge badge-past">Rendido</span>`;
-
-      actionBtn = `<button class="btn-action-card btn-accent-action" onclick="openGradeModal(${ex.id})">📝 Cargar Nota / Resultado</button>`;
-    }
-
-    const formattedDate = `${d} de ${MONTHS[m - 1]} (${ex.date})`;
-
-    return `
-      <div class="exam-card ${ex.isRecu ? 'is-recu-card' : ''}">
-        <div class="exam-card-main">
-          <div class="exam-info">
-            <div class="exam-name-wrap">
-              ${isRecuBadge}
-              <span class="exam-name">${ex.name}</span>
-            </div>
-            <div class="exam-date">📅 ${formattedDate} ${ex.room ? '· 📍 ' + ex.room : ''}</div>
-          </div>
-          <div class="exam-status-col">
-            ${statusBadge}
-          </div>
-          <div class="exam-btns">
-            <button class="btn-icon" title="Editar" onclick="onEditExam(${ex.id})">✏️</button>
-            <button class="btn-icon" title="Borrar" onclick="onDeleteExam(${ex.id})">🗑️</button>
-          </div>
-        </div>
-
-        <div class="exam-card-actions">
-          ${actionBtn}
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-// Modal Cargar Nota
-window.openGradeModal = function(id) {
-  const ex = getExams().find(x => x.id == id);
-  if (!ex) return;
-
-  closeAllForms();
-  document.getElementById('gradeExamId').value = ex.id;
-  document.getElementById('gradeInput').value = ex.grade || '';
-  document.getElementById('gradeStatusInput').value = ex.status !== 'pendiente' ? ex.status : 'aprobado';
-  document.getElementById('autoRecuDateInput').value = '';
-  document.getElementById('autoRecuRoomInput').value = ex.room || '';
-  document.getElementById('gradeFormTitle').textContent = `📝 Calificar: ${ex.name}`;
-  
-  window.onGradeStatusChange();
-  document.getElementById('gradeForm').classList.add('open');
-};
-
-window.onEditExam = function(id) {
-  const ex = getExams().find(x => x.id == id);
-  if (!ex) return;
-
-  closeAllForms();
-  document.getElementById('editExamId').value = ex.id;
-  document.getElementById('examNameInput').value = ex.name;
-  document.getElementById('examDateInput').value = ex.date;
-  document.getElementById('examRoomInput').value = ex.room || '';
-  document.getElementById('formTitle').textContent = 'Editar Datos';
-  document.getElementById('examForm').classList.add('open');
-};
-
-window.onDeleteExam = function(id) {
-  if (confirm('¿Eliminar este registro?')) {
-    saveExams(getExams().filter(x => x.id != id));
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return Math.round((target.getTime() - today.getTime()) / 86400000);
   }
-};
 
-function closeAllForms() {
-  document.getElementById('examForm').classList.remove('open');
-  document.getElementById('gradeForm').classList.remove('open');
-}
+  function statusBadge(ex, diffDays) {
+    if (ex.status === 'aprobado') return `<span class="exam-badge badge-aprobado">🟢 APROBADO (${escapeHtml(ex.grade)})</span>`;
+    if (ex.status === 'recu') return `<span class="exam-badge badge-recu">🟡 A RECU (${escapeHtml(ex.grade)})</span>`;
+    if (ex.status === 'desaprobado') return `<span class="exam-badge badge-desaprobado">🔴 DESAPROBADO (${escapeHtml(ex.grade)})</span>`;
+    if (diffDays === 0) return `<span class="exam-badge badge-today">¡ES HOY!</span>`;
+    if (diffDays === 1) return `<span class="exam-badge badge-soon">¡MAÑANA!</span>`;
+    if (diffDays > 1) return `<span class="exam-badge badge-soon">Faltan ${diffDays}d</span>`;
+    return `<span class="exam-badge badge-past">Rendido</span>`;
+  }
 
-function setupEventListeners() {
-  const btnToggle = document.getElementById('btnToggleExamForm');
-  const btnCancelExam = document.getElementById('btnCancelExam');
-  const btnCancelGrade = document.getElementById('btnCancelGrade');
+  function actionButton(ex) {
+    if (ex.status === 'pendiente') {
+      return `<button class="btn-action-card btn-accent-action" data-action="grade" data-id="${ex.id}">📝 Cargar Nota / Resultado</button>`;
+    }
+    const label = ex.status === 'aprobado' ? '✏️ Cambiar Nota' : '✏️ Modificar';
+    return `<button class="btn-action-card" data-action="grade" data-id="${ex.id}">${label}</button>`;
+  }
 
-  btnToggle.addEventListener('click', () => {
-    closeAllForms();
-    document.getElementById('editExamId').value = '';
-    document.getElementById('examNameInput').value = '';
-    document.getElementById('examDateInput').value = '';
-    document.getElementById('examRoomInput').value = '';
-    document.getElementById('formTitle').textContent = 'Nuevo Parcial';
-    document.getElementById('examForm').classList.add('open');
-  });
+  function render() {
+    const container = document.getElementById('examList');
+    const exams = store.getAll();
+    updateCounters(exams);
 
-  btnCancelExam.addEventListener('click', closeAllForms);
-  btnCancelGrade.addEventListener('click', closeAllForms);
+    const filters = {
+      pendientes: x => x.status === 'pendiente',
+      aprobados: x => x.status === 'aprobado',
+      recus: x => x.status === 'recu' || x.status === 'desaprobado'
+    };
+    const filtered = exams.filter(filters[currentTab]).sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  // 1. Guardar Parcial Base
-  document.getElementById('examForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const id = document.getElementById('editExamId').value;
-    const name = document.getElementById('examNameInput').value.trim();
-    const date = document.getElementById('examDateInput').value;
-    const room = document.getElementById('examRoomInput').value.trim();
-
-    if (!name || !date) return;
-    let exams = getExams();
-
-    if (id) {
-      exams = exams.map(x => x.id == id ? { ...x, name, date, room } : x);
-    } else {
-      exams.push({ id: Date.now(), name, date, room, status: "pendiente", grade: "", isRecu: false });
+    if (filtered.length === 0) {
+      const emptyMsgs = {
+        pendientes: '// no tenés parciales pendientes',
+        aprobados: '// todavía no registraste parciales aprobados',
+        recus: '// sin parciales en recuperatorio o desaprobados'
+      };
+      container.innerHTML = `<div class="empty-day">${emptyMsgs[currentTab]}</div>`;
+      return;
     }
 
-    saveExams(exams);
+    container.innerHTML = filtered.map(ex => {
+      const diffDays = daysUntil(ex.date);
+      const [y, m, d] = ex.date.split('-').map(Number);
+      const formattedDate = `${d} de ${MONTHS[m - 1]} (${ex.date})`;
+      const isRecuBadge = ex.isRecu ? `<span class="recu-tag">⚡ RECU</span>` : '';
+
+      return `
+        <div class="exam-card ${ex.isRecu ? 'is-recu-card' : ''}">
+          <div class="exam-card-main">
+            <div class="exam-info">
+              <div class="exam-name-wrap">
+                ${isRecuBadge}
+                <span class="exam-name">${escapeHtml(ex.name)}</span>
+              </div>
+              <div class="exam-date">📅 ${escapeHtml(formattedDate)} ${ex.room ? '· 📍 ' + escapeHtml(ex.room) : ''}</div>
+            </div>
+            <div class="exam-status-col">${statusBadge(ex, diffDays)}</div>
+            <div class="exam-btns">
+              <button class="btn-icon" title="Editar" data-action="edit" data-id="${ex.id}">✏️</button>
+              <button class="btn-icon" title="Borrar" data-action="delete" data-id="${ex.id}">🗑️</button>
+            </div>
+          </div>
+          <div class="exam-card-actions">${actionButton(ex)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function openGradeModal(id) {
+    const ex = store.find(id);
+    if (!ex) return;
     closeAllForms();
-  });
+    document.getElementById('gradeExamId').value = ex.id;
+    document.getElementById('gradeInput').value = ex.grade || '';
+    document.getElementById('gradeStatusInput').value = ex.status !== 'pendiente' ? ex.status : 'aprobado';
+    document.getElementById('autoRecuDateInput').value = '';
+    document.getElementById('autoRecuRoomInput').value = ex.room || '';
+    document.getElementById('gradeFormTitle').textContent = `📝 Calificar: ${ex.name}`;
+    onGradeStatusChange();
+    document.getElementById('gradeForm').classList.add('open');
+  }
 
-  // 2. Guardar Calificación / Crear Recuperatorio automático
-  document.getElementById('gradeForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const id = parseInt(document.getElementById('gradeExamId').value);
-    const grade = document.getElementById('gradeInput').value.trim();
-    const status = document.getElementById('gradeStatusInput').value;
-    const recuDate = document.getElementById('autoRecuDateInput').value;
-    const recuRoom = document.getElementById('autoRecuRoomInput').value.trim();
+  function openEditForm(id) {
+    const ex = store.find(id);
+    if (!ex) return;
+    closeAllForms();
+    document.getElementById('editExamId').value = ex.id;
+    document.getElementById('examNameInput').value = ex.name;
+    document.getElementById('examDateInput').value = ex.date;
+    document.getElementById('examRoomInput').value = ex.room || '';
+    document.getElementById('formTitle').textContent = 'Editar Datos';
+    document.getElementById('examForm').classList.add('open');
+  }
 
-    if (!grade) return;
-    let exams = getExams();
+  function deleteExam(id) {
+    if (confirm('¿Eliminar este registro?')) {
+      store.remove(id);
+      render();
+    }
+  }
 
-    // Actualizar parcial rendido
-    exams = exams.map(x => {
-      if (x.id === id) {
-        return { ...x, grade, status };
-      }
-      return x;
+  function closeAllForms() {
+    document.getElementById('examForm').classList.remove('open');
+    document.getElementById('gradeForm').classList.remove('open');
+  }
+
+  function setupListDelegation() {
+    delegate(document.getElementById('examList'), '[data-action]', (el) => {
+      const id = el.dataset.id;
+      const action = el.dataset.action;
+      if (action === 'grade') openGradeModal(id);
+      else if (action === 'edit') openEditForm(id);
+      else if (action === 'delete') deleteExam(id);
+    });
+  }
+
+  function setupTabs() {
+    document.getElementById('tabPendientes').addEventListener('click', () => switchTab('pendientes'));
+    document.getElementById('tabAprobados').addEventListener('click', () => switchTab('aprobados'));
+    document.getElementById('tabRecu').addEventListener('click', () => switchTab('recus'));
+  }
+
+  function setupForms() {
+    const btnToggle = document.getElementById('btnToggleExamForm');
+    btnToggle.addEventListener('click', () => {
+      closeAllForms();
+      document.getElementById('editExamId').value = '';
+      document.getElementById('examNameInput').value = '';
+      document.getElementById('examDateInput').value = '';
+      document.getElementById('examRoomInput').value = '';
+      document.getElementById('formTitle').textContent = 'Nuevo Parcial';
+      document.getElementById('examForm').classList.add('open');
     });
 
-    // Si va a recuperatorio y se ingresó fecha, creamos el nuevo parcial pendiente
-    if (status === 'recu' && recuDate) {
-      const parentExam = exams.find(x => x.id === id);
-      const recuName = parentExam.name.startsWith('Recu:') ? parentExam.name : `Recu: ${parentExam.name}`;
-      
-      exams.push({
-        id: Date.now(),
-        name: recuName,
-        date: recuDate,
-        room: recuRoom,
-        status: "pendiente",
-        grade: "",
-        isRecu: true
-      });
-    }
+    document.getElementById('btnCancelExam').addEventListener('click', closeAllForms);
+    document.getElementById('btnCancelGrade').addEventListener('click', closeAllForms);
+    document.getElementById('gradeStatusInput').addEventListener('change', onGradeStatusChange);
 
-    saveExams(exams);
-    closeAllForms();
-  });
-}
+    document.getElementById('examForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('editExamId').value;
+      const name = document.getElementById('examNameInput').value.trim();
+      const date = document.getElementById('examDateInput').value;
+      const room = document.getElementById('examRoomInput').value.trim();
+      if (!name || !date) return;
 
-function initTheme() {
-  const saved = localStorage.getItem('horario_apu_theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  const btnDark = document.getElementById('btnDark');
-  const btnLight = document.getElementById('btnLight');
+      if (id) store.update(id, { name, date, room });
+      else store.add({ name, date, room, status: 'pendiente', grade: '', isRecu: false });
 
-  function setTheme(mode) {
-    document.documentElement.setAttribute('data-theme', mode);
-    localStorage.setItem('horario_apu_theme', mode);
-    if (btnDark) btnDark.classList.toggle('active', mode === 'dark');
-    if (btnLight) btnLight.classList.toggle('active', mode === 'light');
+      closeAllForms();
+      render();
+    });
+
+    document.getElementById('gradeForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = document.getElementById('gradeExamId').value;
+      const grade = document.getElementById('gradeInput').value.trim();
+      const status = document.getElementById('gradeStatusInput').value;
+      const recuDate = document.getElementById('autoRecuDateInput').value;
+      const recuRoom = document.getElementById('autoRecuRoomInput').value.trim();
+      if (!grade) return;
+
+      const parent = store.find(id);
+      store.update(id, { grade, status });
+
+      // Si va a recuperatorio y se cargó fecha, se crea automáticamente
+      // el nuevo parcial pendiente correspondiente al recu.
+      if (status === 'recu' && recuDate && parent) {
+        const recuName = parent.name.startsWith('Recu:') ? parent.name : `Recu: ${parent.name}`;
+        store.add({ name: recuName, date: recuDate, room: recuRoom, status: 'pendiente', grade: '', isRecu: true });
+      }
+
+      closeAllForms();
+      render();
+    });
   }
 
-  setTheme(saved);
-  if (btnDark) btnDark.addEventListener('click', () => setTheme('dark'));
-  if (btnLight) btnLight.addEventListener('click', () => setTheme('light'));
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  initTheme();
-  renderExams();
-  setupEventListeners();
-});
+  document.addEventListener('DOMContentLoaded', () => {
+    App.initTheme();
+    setupTabs();
+    setupForms();
+    setupListDelegation();
+    render();
+  });
+})();

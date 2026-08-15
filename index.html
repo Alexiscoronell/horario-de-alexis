@@ -4,7 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
   <title>~/horario_apu.sh</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <meta name="theme-color" content="#11161d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Horario APU">
+
   <link rel="stylesheet" href="style.css">
+  <script src="shared.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -36,13 +46,13 @@
       <div class="live-text" id="liveContent">Calculando runtime...</div>
     </section>
 
-    <!-- Herramientas y Módulos Plegables (Oculto por defecto para no ocupar espacio) -->
+    <!-- Herramientas y Módulos Plegables -->
     <details class="tools-drawer">
       <summary class="tools-summary">
         <span>⚙️ MODULOS & HERRAMIENTAS</span>
         <span class="tools-chev">▾</span>
       </summary>
-      
+
       <div class="tools-content">
         <div class="menu-grid">
           <a href="parciales.html" class="menu-card menu-parciales">
@@ -79,12 +89,8 @@
       </div>
     </details>
 
-    <!-- Alerta de Choques -->
-    <div class="alert">
-      <div class="alert-title">⚠ SUPERPOSICIONES DETECTADAS (PLAN 2010)</div>
-      <div class="alert-item"><b>Lunes 18:30–19:00:</b> Choque entre Estadística y Dev. Software (P).</div>
-      <div class="alert-item"><b>Viernes 18:00–19:00:</b> Choque entre Dev. Software (P) y Estadística.</div>
-    </div>
+    <!-- Alerta de choques: generada automáticamente por app.js a partir de los horarios -->
+    <section class="alert" id="alertBox"></section>
 
     <!-- Leyenda -->
     <div class="legend">

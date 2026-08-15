@@ -4,7 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
   <title>parciales.log · Informática</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <meta name="theme-color" content="#11161d">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Horario APU">
+
   <link rel="stylesheet" href="style.css">
+  <script src="shared.js" defer></script>
   <script src="parciales.js" defer></script>
 </head>
 <body>
@@ -28,17 +38,17 @@
 
     <!-- Botones / Pestañas de Filtro Táctiles -->
     <section class="tabs-bar">
-      <button class="tab-btn active" id="tabPendientes" onclick="switchTab('pendientes')">
+      <button class="tab-btn active" id="tabPendientes" type="button">
         <span class="tab-num" id="countPendientes">0</span>
         <span class="tab-label">⏳ Pendientes</span>
       </button>
 
-      <button class="tab-btn" id="tabAprobados" onclick="switchTab('aprobados')">
+      <button class="tab-btn" id="tabAprobados" type="button">
         <span class="tab-num" id="countAprobados" style="color:var(--green);">0</span>
         <span class="tab-label">🟢 Aprobados</span>
       </button>
 
-      <button class="tab-btn" id="tabRecu" onclick="switchTab('recus')">
+      <button class="tab-btn" id="tabRecu" type="button">
         <span class="tab-num" id="countRecus" style="color:var(--danger);">0</span>
         <span class="tab-label">🟡/🔴 Recu & Desapr</span>
       </button>
@@ -56,7 +66,7 @@
         <form class="parcial-form" id="examForm">
           <div class="form-title" id="formTitle">Nuevo Parcial</div>
           <input type="hidden" id="editExamId">
-          
+
           <div class="form-row">
             <input type="text" id="examNameInput" class="form-input" placeholder="Materia (ej: 1° Parcial Dev. Software)" required>
           </div>
@@ -75,9 +85,9 @@
         <form class="parcial-form" id="gradeForm" style="border-color:var(--cyan);">
           <div class="form-title" id="gradeFormTitle">📝 Cargar Calificación</div>
           <input type="hidden" id="gradeExamId">
-          
+
           <div class="form-row">
-            <select id="gradeStatusInput" class="form-input" onchange="onGradeStatusChange()">
+            <select id="gradeStatusInput" class="form-input">
               <option value="aprobado">🟢 Aprobado</option>
               <option value="recu">🟡 A Recuperatorio</option>
               <option value="desaprobado">🔴 Desaprobado Definitivo</option>
