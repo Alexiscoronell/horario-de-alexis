@@ -30,67 +30,63 @@
       </div>
     </header>
 
-    <!-- Widget Estado en Vivo -->
+    <!-- Widget Estado en Vivo (Lo primero al entrar) -->
     <section class="live-card" id="liveCard">
       <div class="live-dot" id="liveDot"></div>
       <div class="live-text" id="liveContent">Calculando runtime...</div>
     </section>
 
-    <!-- Hub de Módulos & Herramientas -->
-    <section class="menu-hub">
-      <div class="menu-hub-title">// MODULOS & HERRAMIENTAS</div>
+    <!-- Herramientas y Módulos Plegables (Oculto por defecto para no ocupar espacio) -->
+    <details class="tools-drawer">
+      <summary class="tools-summary">
+        <span>⚙️ MODULOS & HERRAMIENTAS</span>
+        <span class="tools-chev">▾</span>
+      </summary>
       
-      <div class="menu-grid">
-        <a href="parciales.html" class="menu-card menu-parciales">
-          <div class="menu-icon">📝</div>
-          <div class="menu-info">
-            <span class="menu-name">parciales.log</span>
-            <span class="menu-desc">Notas, aprobados y recuperatorios</span>
+      <div class="tools-content">
+        <div class="menu-grid">
+          <a href="parciales.html" class="menu-card menu-parciales">
+            <div class="menu-icon">📝</div>
+            <div class="menu-info">
+              <span class="menu-name">parciales.log</span>
+              <span class="menu-desc">Parciales, notas y recuperatorios</span>
+            </div>
+            <span class="menu-arrow">→</span>
+          </a>
+
+          <a href="recursos.html" class="menu-card menu-recursos">
+            <div class="menu-icon">📚</div>
+            <div class="menu-info">
+              <span class="menu-name">bookmarks.json</span>
+              <span class="menu-desc">Plan de estudio, campus y webs útiles</span>
+            </div>
+            <span class="menu-arrow">→</span>
+          </a>
+        </div>
+
+        <!-- Respaldo JSON -->
+        <div class="backup-box">
+          <div class="backup-info">
+            <span class="backup-title">💾 Backup & Restore</span>
+            <span class="backup-desc">Exportá o cargá tu archivo .json</span>
           </div>
-          <span class="menu-arrow">→</span>
-        </a>
-
-        <a href="recursos.html" class="menu-card menu-recursos">
-          <div class="menu-icon">📚</div>
-          <div class="menu-info">
-            <span class="menu-name">bookmarks.json</span>
-            <span class="menu-desc">Plan de estudio, campus y webs útiles</span>
+          <div class="backup-actions">
+            <button class="btn-backup" id="btnExportBackup" type="button">📥 Export</button>
+            <input type="file" id="backupFileInput" accept=".json" style="display:none">
+            <button class="btn-backup" id="btnImportBackup" type="button">📤 Import</button>
           </div>
-          <span class="menu-arrow">→</span>
-        </a>
-      </div>
-
-      <!-- Sincronización con Google Calendar -->
-      <div class="sync-card">
-        <div class="backup-info">
-          <span class="backup-title">📅 Sincronizar Google Calendar</span>
-          <span class="backup-desc">Exportá tus clases y parciales con alarmas en 1 clic</span>
-        </div>
-        <button class="btn-sync" id="btnSyncCalendar" type="button">⚡ Sincronizar (.ics)</button>
-      </div>
-
-      <!-- Respaldo integrado -->
-      <div class="backup-box">
-        <div class="backup-info">
-          <span class="backup-title">💾 Backup & Restore</span>
-          <span class="backup-desc">Exportá o cargá tu archivo .json</span>
-        </div>
-        <div class="backup-actions">
-          <button class="btn-backup" id="btnExportBackup" type="button">📥 Export</button>
-          <input type="file" id="backupFileInput" accept=".json" style="display:none">
-          <button class="btn-backup" id="btnImportBackup" type="button">📤 Import</button>
         </div>
       </div>
-    </section>
+    </details>
 
-    <!-- Alerta de superposiciones -->
+    <!-- Alerta de Choques -->
     <div class="alert">
       <div class="alert-title">⚠ SUPERPOSICIONES DETECTADAS (PLAN 2010)</div>
       <div class="alert-item"><b>Lunes 18:30–19:00:</b> Choque entre Estadística y Dev. Software (P).</div>
       <div class="alert-item"><b>Viernes 18:00–19:00:</b> Choque entre Dev. Software (P) y Estadística.</div>
     </div>
 
-    <!-- Leyenda de Materias -->
+    <!-- Leyenda -->
     <div class="legend">
       <span><i class="sw" style="background:var(--cyan)"></i> IF013 Fundamentos</span>
       <span><i class="sw" style="background:var(--purple)"></i> IF012 Dev. Software</span>
@@ -98,13 +94,13 @@
       <span><i class="sw" style="background:var(--danger)"></i> Choque</span>
     </div>
 
-    <!-- Contenedor Días de la Semana -->
+    <!-- Cursada Principal -->
     <main id="days"></main>
 
-    <footer class="tip">// tocá una materia para ver logs detallados — tocá el día para plegar/desplegar</footer>
+    <footer class="tip">// tocá una materia para ver el aula — tocá el día para plegar</footer>
   </div>
 
-  <!-- Modal Detalle de Cursada -->
+  <!-- Modal Detalle -->
   <div class="modal-bg" id="modalBg">
     <div class="modal">
       <div class="modal-bar">

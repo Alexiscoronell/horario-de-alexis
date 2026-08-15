@@ -1,21 +1,21 @@
 const SCHEDULE = {
   "Lunes": [
-    { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (T)", time: "12:00 – 14:00", room: "Lab. Fidel", desc: "Bloque teórico, mediodía.", conflict: false, dayIndex: 1 },
-    { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (P)", time: "14:00 – 16:00", room: "Lab. Fidel", desc: "Práctica continua en laboratorio.", conflict: false, dayIndex: 1 },
-    { code: "MA006", cls: "c-ma006", name: "Estadística (T/P)", time: "16:00 – 19:00", room: "Aula 13", desc: "Últimos 30 min (18:30–19:00) se superponen con Desarrollo de Software (P).", conflict: true, dayIndex: 1 },
-    { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (P)", time: "18:30 – 20:30", room: "Aula 3 anexo", desc: "Primeros 30 min (18:30–19:00) se superponen con Estadística.", conflict: true, dayIndex: 1 }
+    { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (T)", time: "12:00 – 14:00", room: "Lab. Fidel", desc: "Bloque teórico, mediodía.", conflict: false },
+    { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (P)", time: "14:00 – 16:00", room: "Lab. Fidel", desc: "Práctica continua en laboratorio.", conflict: false },
+    { code: "MA006", cls: "c-ma006", name: "Estadística (T/P)", time: "16:00 – 19:00", room: "Aula 13", desc: "Últimos 30 min (18:30–19:00) se superponen con Desarrollo de Software (P).", conflict: true },
+    { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (P)", time: "18:30 – 20:30", room: "Aula 3 anexo", desc: "Primeros 30 min (18:30–19:00) se superponen con Estadística.", conflict: true }
   ],
   "Martes": [],
   "Miércoles": [
-    { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (T)", time: "11:30 – 13:30", room: "Aula común", desc: "Teoría de Desarrollo de Software.", conflict: false, dayIndex: 3 },
-    { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (P)", time: "14:00 – 16:00", room: "Aula 103", desc: "Práctica de Fundamentos.", conflict: false, dayIndex: 3 },
-    { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (T)", time: "16:00 – 18:00", room: "Aula 103", desc: "Teoría de Fundamentos.", conflict: false, dayIndex: 3 }
+    { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (T)", time: "11:30 – 13:30", room: "Aula común", desc: "Teoría de Desarrollo de Software.", conflict: false },
+    { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (P)", time: "14:00 – 16:00", room: "Aula 103", desc: "Práctica de Fundamentos.", conflict: false },
+    { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (T)", time: "16:00 – 18:00", room: "Aula 103", desc: "Teoría de Fundamentos.", conflict: false }
   ],
   "Jueves": [],
   "Viernes": [
-    { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (T)", time: "14:00 – 16:00", room: "Aula 7 anexo", desc: "Bloque teórico inicial.", conflict: false, dayIndex: 5 },
-    { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (P)", time: "16:00 – 19:00", room: "Aula 7 anexo", desc: "Última hora (18:00–19:00) se superpone con Estadística.", conflict: true, dayIndex: 5 },
-    { code: "MA006", cls: "c-ma006", name: "Estadística (T/P)", time: "18:00 – 21:00", room: "Aula 14 y 12", desc: "Primera hora (18:00–19:00) se superpone con Desarrollo de Software (P).", conflict: true, dayIndex: 5 }
+    { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (T)", time: "14:00 – 16:00", room: "Aula 7 anexo", desc: "Bloque teórico inicial.", conflict: false },
+    { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (P)", time: "16:00 – 19:00", room: "Aula 7 anexo", desc: "Última hora (18:00–19:00) se superpone con Estadística.", conflict: true },
+    { code: "MA006", cls: "c-ma006", name: "Estadística (T/P)", time: "18:00 – 21:00", room: "Aula 14 y 12", desc: "Primera hora (18:00–19:00) se superpone con Desarrollo de Software (P).", conflict: true }
   ],
   "Sábado": []
 };
@@ -31,7 +31,7 @@ function parseMinutes(timeStr) {
   if (parts.length !== 2) return null;
   const [h1, m1] = parts[0].split(':').map(Number);
   const [h2, m2] = parts[1].split(':').map(Number);
-  return { start: h1 * 60 + m1, end: h2 * 60 + m2, startStr: parts[0], endStr: parts[1], h1, m1, h2, m2 };
+  return { start: h1 * 60 + m1, end: h2 * 60 + m2, startStr: parts[0], endStr: parts[1] };
 }
 
 function renderDays() {
@@ -137,125 +137,7 @@ function updateLiveStatus() {
   }
 }
 
-// ==========================================
-// EXPORTADOR A GOOGLE CALENDAR (.ICS) OPTIMIZADO PARA MÓVIL
-// ==========================================
-async function generateICSFile() {
-  const pad = (n) => String(n).padStart(2, '0');
-  let icsLines = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "PRODID:-//Alexis Coronel//Horario APU Informática//ES",
-    "CALSCALE:GREGORIAN",
-    "METHOD:PUBLISH",
-    "X-WR-CALNAME:Horario APU - Informática",
-    "X-WR-TIMEZONE:America/Argentina/Buenos_Aires"
-  ];
-
-  const now = new Date();
-  const year = now.getFullYear();
-  const daysMap = { "Lunes": "MO", "Martes": "TU", "Miércoles": "WE", "Jueves": "TH", "Viernes": "FR", "Sábado": "SA" };
-
-  // 1. Cursadas semanales recurrentes
-  Object.keys(SCHEDULE).forEach(day => {
-    const list = SCHEDULE[day];
-    const byDay = daysMap[day];
-    if (!byDay || list.length === 0) return;
-
-    list.forEach((item, idx) => {
-      const p = parseMinutes(item.time);
-      if (!p) return;
-
-      const baseDate = new Date();
-      const targetDay = item.dayIndex;
-      const currentDay = baseDate.getDay();
-      let diff = targetDay - currentDay;
-      if (diff < 0) diff += 7;
-      baseDate.setDate(baseDate.getDate() + diff);
-
-      const dStr = `${baseDate.getFullYear()}${pad(baseDate.getMonth() + 1)}${pad(baseDate.getDate())}`;
-      const dtStart = `${dStr}T${pad(p.h1)}${pad(p.m1)}00`;
-      const dtEnd = `${dStr}T${pad(p.h2)}${pad(p.m2)}00`;
-
-      icsLines.push(
-        "BEGIN:VEVENT",
-        `UID:clase-${item.code}-${day}-${idx}-${year}@horario-apu`,
-        `DTSTAMP:${year}0101T000000Z`,
-        `DTSTART;TZID=America/Argentina/Buenos_Aires:${dtStart}`,
-        `DTEND;TZID=America/Argentina/Buenos_Aires:${dtEnd}`,
-        `RRULE:FREQ=WEEKLY;UNTIL=${year}1220T235959Z;BYDAY=${byDay}`,
-        `SUMMARY:${item.code} — ${item.name}`,
-        `LOCATION:${item.room}`,
-        `DESCRIPTION:${item.desc.replace(/,/g, '\\,')}`,
-        "BEGIN:VALARM",
-        "TRIGGER:-PT15M",
-        "ACTION:DISPLAY",
-        "DESCRIPTION:Recordatorio de clase en 15 min",
-        "END:VALARM",
-        "END:VEVENT"
-      );
-    });
-  });
-
-  // 2. Parciales y recuperatorios guardados
-  try {
-    const exams = JSON.parse(localStorage.getItem('horario_apu_parciales') || '[]');
-    exams.forEach(ex => {
-      if (!ex.date) return;
-      const cleanDate = ex.date.replace(/-/g, '');
-      icsLines.push(
-        "BEGIN:VEVENT",
-        `UID:parcial-${ex.id}@horario-apu`,
-        `DTSTAMP:${year}0101T000000Z`,
-        `DTSTART;VALUE=DATE:${cleanDate}`,
-        `DTEND;VALUE=DATE:${cleanDate}`,
-        `SUMMARY:📝 ${ex.name} ${ex.grade ? '(Nota: ' + ex.grade + ')' : ''}`,
-        `DESCRIPTION:Estado: ${ex.status || 'Pendiente'}.`,
-        "BEGIN:VALARM",
-        "TRIGGER:-P1D",
-        "ACTION:DISPLAY",
-        "DESCRIPTION:¡Mañana rinden examen!",
-        "END:VALARM",
-        "END:VEVENT"
-      );
-    });
-  } catch (e) {}
-
-  icsLines.push("END:VCALENDAR");
-
-  const icsData = icsLines.join("\r\n");
-  const blob = new Blob([icsData], { type: "text/calendar;charset=utf-8" });
-  const file = new File([blob], "horario_apu_calendar.ics", { type: "text/calendar" });
-
-  // Si el teléfono soporta compartir nativamente
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({
-        files: [file],
-        title: 'Horario APU',
-        text: 'Abrir con Google Calendar o Calendario'
-      });
-      return;
-    } catch (err) {
-      if (err.name === 'AbortError') return;
-    }
-  }
-
-  // Descarga tradicional
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = `horario_apu_calendar.ics`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(link.href);
-
-  alert("📥 Se descargó 'horario_apu_calendar.ics'.\n\n👉 Deslizá la barra de notificaciones de tu celu y tocá la descarga completada para abrirla con Google Calendar.");
-}
-
-// ==========================================
-// BACKUP Y MODAL
-// ==========================================
+// Modal
 const modalBg = document.getElementById('modalBg');
 function openModal(day, it) {
   document.getElementById('mTitle').textContent = `${it.code} — ${it.name}`;
@@ -271,13 +153,11 @@ document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('modalClose2').addEventListener('click', closeModal);
 modalBg.addEventListener('click', e => { if (e.target === modalBg) closeModal(); });
 
-function setupBackupAndSync() {
-  const btnSync = document.getElementById('btnSyncCalendar');
+// Sistema de Backup JSON
+function setupBackupHandlers() {
   const btnExport = document.getElementById('btnExportBackup');
   const btnImport = document.getElementById('btnImportBackup');
   const fileInput = document.getElementById('backupFileInput');
-
-  if (btnSync) btnSync.addEventListener('click', generateICSFile);
 
   if (btnExport) {
     btnExport.addEventListener('click', () => {
@@ -313,7 +193,7 @@ function setupBackupAndSync() {
           alert('✅ ¡Backup restaurado con éxito!');
           location.reload();
         } catch (err) {
-          alert('❌ Error: Archivo JSON inválido.');
+          alert('❌ Error: Archivo JSON no válido.');
         }
       };
       reader.readAsText(file);
@@ -343,6 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   renderDays();
   updateLiveStatus();
-  setupBackupAndSync();
+  setupBackupHandlers();
   setInterval(updateLiveStatus, 30000);
 });
