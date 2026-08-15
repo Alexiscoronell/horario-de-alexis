@@ -138,9 +138,9 @@ function updateLiveStatus() {
 }
 
 // ==========================================
-// EXPORTADOR A GOOGLE CALENDAR (.ICS)
+// EXPORTADOR A GOOGLE CALENDAR (.ICS) OPTIMIZADO PARA MÓVIL
 // ==========================================
-function generateICSFile() {
+async function generateICSFile() {
   const pad = (n) => String(n).padStart(2, '0');
   let icsLines = [
     "BEGIN:VCALENDAR",
@@ -152,12 +152,11 @@ function generateICSFile() {
     "X-WR-TIMEZONE:America/Argentina/Buenos_Aires"
   ];
 
-  // 1. Exportar Cursadas Semanales (Hasta fin de año)
   const now = new Date();
   const year = now.getFullYear();
-
   const daysMap = { "Lunes": "MO", "Martes": "TU", "Miércoles": "WE", "Jueves": "TH", "Viernes": "FR", "Sábado": "SA" };
 
+  // 1. Cursadas semanales recurrentes
   Object.keys(SCHEDULE).forEach(day => {
     const list = SCHEDULE[day];
     const byDay = daysMap[day];
@@ -167,7 +166,6 @@ function generateICSFile() {
       const p = parseMinutes(item.time);
       if (!p) return;
 
-      // Buscar el próximo día de la semana correspondiente
       const baseDate = new Date();
       const targetDay = item.dayIndex;
       const currentDay = baseDate.getDay();
@@ -192,14 +190,14 @@ function generateICSFile() {
         "BEGIN:VALARM",
         "TRIGGER:-PT15M",
         "ACTION:DISPLAY",
-        "DESCRIPTION:Recordatorio de clase en 15 minutos",
+        "DESCRIPTION:Recordatorio de clase en 15 min",
         "END:VALARM",
         "END:VEVENT"
       );
     });
   });
 
-  // 2. Exportar Parciales y Recuperatorios
+  // 2. Parciales y recuperatorios guardados
   try {
     const exams = JSON.parse(localStorage.getItem('horario_apu_parciales') || '[]');
     exams.forEach(ex => {
@@ -212,7 +210,7 @@ function generateICSFile() {
         `DTSTART;VALUE=DATE:${cleanDate}`,
         `DTEND;VALUE=DATE:${cleanDate}`,
         `SUMMARY:📝 ${ex.name} ${ex.grade ? '(Nota: ' + ex.grade + ')' : ''}`,
-        `DESCRIPTION:Estado: ${ex.status || 'Pendiente'}. ${ex.recuDate ? 'Recu: ' + ex.recuDate : ''}`,
+        `DESCRIPTION:Estado: ${ex.status || 'Pendiente'}.`,
         "BEGIN:VALARM",
         "TRIGGER:-P1D",
         "ACTION:DISPLAY",
@@ -220,32 +218,30 @@ function generateICSFile() {
         "END:VALARM",
         "END:VEVENT"
       );
-
-      // Si tiene recuperatorio cargado
-      if (ex.recuDate) {
-        const cleanRecuDate = ex.recuDate.replace(/-/g, '');
-        icsLines.push(
-          "BEGIN:VEVENT",
-          `UID:recu-${ex.id}@horario-apu`,
-          `DTSTAMP:${year}0101T000000Z`,
-          `DTSTART;VALUE=DATE:${cleanRecuDate}`,
-          `DTEND;VALUE=DATE:${cleanRecuDate}`,
-          `SUMMARY:🟡 RECUPERATORIO: ${ex.name}`,
-          `DESCRIPTION:Recuperatorio registrado para ${ex.name}`,
-          "BEGIN:VALARM",
-          "TRIGGER:-P1D",
-          "ACTION:DISPLAY",
-          "DESCRIPTION:¡Mañana es el recuperatorio!",
-          "END:VALARM",
-          "END:VEVENT"
-        );
-      }
     });
   } catch (e) {}
 
   icsLines.push("END:VCALENDAR");
 
-  const blob = new Blob([icsLines.join("\r\n")], { type: "text/calendar;charset=utf-8" });
+  const icsData = icsLines.join("\r\n");
+  const blob = new Blob([icsData], { type: "text/calendar;charset=utf-8" });
+  const file = new File([blob], "horario_apu_calendar.ics", { type: "text/calendar" });
+
+  // Si el teléfono soporta compartir nativamente
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({
+        files: [file],
+        title: 'Horario APU',
+        text: 'Abrir con Google Calendar o Calendario'
+      });
+      return;
+    } catch (err) {
+      if (err.name === 'AbortError') return;
+    }
+  }
+
+  // Descarga tradicional
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = `horario_apu_calendar.ics`;
@@ -253,6 +249,8 @@ function generateICSFile() {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(link.href);
+
+  alert("📥 Se descargó 'horario_apu_calendar.ics'.\n\n👉 Deslizá la barra de notificaciones de tu celu y tocá la descarga completada para abrirla con Google Calendar.");
 }
 
 // ==========================================

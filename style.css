@@ -452,3 +452,107 @@ details[open] > summary .chev { transform: rotate(90deg); }
   margin-top: 4px;
 }
 .recu-notice b { color: var(--text); }
+
+
+
+/* -------- Stats Bar -------- */
+.stats-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.stat-item {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-dim);
+}
+.stat-num {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+/* -------- Estilo de Tarjetas de Parcial -------- */
+.exam-card {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s ease;
+}
+
+.exam-card.is-recu-card {
+  border-left: 4px solid #ffbd2e;
+  background: rgba(255, 189, 46, 0.03);
+}
+
+.exam-card-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.exam-name-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.recu-tag {
+  font-size: 9px;
+  font-weight: 800;
+  background: rgba(255, 189, 46, 0.18);
+  color: #ffbd2e;
+  border: 1px solid #ffbd2e;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.exam-card-actions {
+  display: flex;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-soft);
+}
+
+.btn-action-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-action-card:active { transform: scale(0.96); }
+
+.btn-accent-action {
+  background: rgba(0, 255, 127, 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-danger-action {
+  background: rgba(255, 61, 99, 0.15);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* Badges */
+.badge-aprobado { background: rgba(93, 255, 176, 0.15); color: var(--green); border: 1px solid var(--green); }
+.badge-desaprobado { background: rgba(255, 61, 99, 0.15); color: var(--danger); border: 1px solid var(--danger); }

@@ -10,7 +10,7 @@
 <body>
 
   <div class="wrap">
-    <!-- Header -->
+    <!-- Terminal Header -->
     <header class="term">
       <div class="term-bar">
         <a href="index.html" class="btn-back">← cd .. (volver)</a>
@@ -20,66 +20,92 @@
         </div>
       </div>
       <div class="term-body">
-        <div><span class="prompt">$</span> ./check_exams.sh --status<span class="cursor"></span></div>
+        <div><span class="prompt">$</span> ./check_exams.sh --workflow<span class="cursor"></span></div>
         <h1>CONTROL DE PARCIALES & NOTAS</h1>
-        <div class="meta">Seguimiento de calificaciones, aprobados y recuperatorios</div>
+        <div class="meta">Registro de exámenes, calificaciones y gestión de recuperatorios</div>
       </div>
     </header>
 
-    <!-- Resumen de Métricas de Aprobación -->
-    <section class="stats-bar" id="statsBar">
+    <!-- Barra de Métricas y Promedio -->
+    <section class="stats-bar">
       <div class="stat-item"><span class="stat-num" id="countAprobados" style="color:var(--green);">0</span> Aprobados</div>
       <div class="stat-item"><span class="stat-num" id="countPendientes" style="color:var(--cyan);">0</span> Pendientes</div>
       <div class="stat-item"><span class="stat-num" id="countRecu" style="color:var(--danger);">0</span> A Recu</div>
+      <div class="stat-item"><span class="stat-num" id="promedioGeneral" style="color:var(--purple);">—</span> Promedio</div>
     </section>
 
-    <!-- Parciales Box -->
+    <!-- Contenedor Principal -->
     <section class="parciales-box">
       <div class="parciales-head">
-        <span>// DEADLINES & CALIFICACIONES</span>
-        <button class="btn-mini" id="btnToggleExamForm" type="button">+ Agregar Parcial</button>
+        <span>// LISTA DE PARCIALES & DEADLINES</span>
+        <button class="btn-mini" id="btnToggleExamForm" type="button">+ Nuevo Parcial</button>
       </div>
+
       <div class="parciales-body">
-        <!-- Formulario CRUD -->
+        <!-- 1. Formulario Nuevo Parcial Base -->
         <form class="parcial-form" id="examForm">
-          <div class="form-title" id="formTitle">Nuevo Registro de Parcial</div>
+          <div class="form-title" id="formTitle">Nuevo Parcial</div>
           <input type="hidden" id="editExamId">
           
           <div class="form-row">
             <input type="text" id="examNameInput" class="form-input" placeholder="Nombre (ej: 1° Parcial Dev. Software)" required>
-            <input type="date" id="examDateInput" class="form-input" required>
           </div>
-
           <div class="form-row">
-            <select id="examStatusInput" class="form-input" onchange="toggleRecuFields()">
-              <option value="pendiente">⏳ Pendiente / Por rendir</option>
-              <option value="aprobado">🟢 Aprobado</option>
-              <option value="recu">🟡 A Recuperatorio</option>
-              <option value="desaprobado">🔴 Desaprobado</option>
-            </select>
-            <input type="number" step="0.5" min="1" max="10" id="examGradeInput" class="form-input" placeholder="Nota obtenida (ej: 8)">
-          </div>
-
-          <!-- Campos de Recuperatorio (Desplegables) -->
-          <div id="recuFieldsGroup" style="display:none; flex-direction:column; gap:8px;">
-            <div class="form-row">
-              <input type="date" id="examRecuDateInput" class="form-input" title="Fecha del recuperatorio">
-              <input type="number" step="0.5" min="1" max="10" id="examRecuGradeInput" class="form-input" placeholder="Nota del Recu (opcional)">
-            </div>
+            <input type="date" id="examDateInput" class="form-input" required>
+            <input type="text" id="examRoomInput" class="form-input" placeholder="Aula / Lab (opcional)">
           </div>
 
           <div class="form-actions">
             <button type="button" class="btn-sub" id="btnCancelExam">Cancelar</button>
-            <button type="submit" class="btn-mini" style="padding:6px 14px;">Guardar</button>
+            <button type="submit" class="btn-mini" style="padding:6px 16px;">Guardar Parcial</button>
           </div>
         </form>
 
-        <!-- Lista de Tarjetas -->
+        <!-- 2. Formulario Modal: Cargar Nota / Resultado -->
+        <form class="parcial-form" id="gradeForm" style="border-color:var(--cyan);">
+          <div class="form-title" id="gradeFormTitle">📝 Cargar Nota del Examen</div>
+          <input type="hidden" id="gradeExamId">
+          
+          <div class="form-row">
+            <input type="number" step="0.25" min="1" max="10" id="gradeInput" class="form-input" placeholder="Nota obtenida (ej: 8 o 4)" required>
+            <select id="gradeStatusOverride" class="form-input">
+              <option value="auto">🤖 Auto (≥6 Aprueba)</option>
+              <option value="aprobado">🟢 Aprobado</option>
+              <option value="desaprobado">🔴 Desaprobado / Recu</option>
+            </select>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-sub" id="btnCancelGrade">Cancelar</button>
+            <button type="submit" class="btn-mini" style="background:var(--cyan); color:#04140a;">Confirmar Nota</button>
+          </div>
+        </form>
+
+        <!-- 3. Formulario Modal: Crear Recuperatorio -->
+        <form class="parcial-form" id="recuForm" style="border-color:var(--danger);">
+          <div class="form-title" id="recuFormTitle">⚡ Programar Recuperatorio</div>
+          <input type="hidden" id="recuParentId">
+          
+          <div class="form-row">
+            <input type="text" id="recuNameInput" class="form-input" required>
+          </div>
+          <div class="form-row">
+            <input type="date" id="recuDateInput" class="form-input" required>
+            <input type="text" id="recuRoomInput" class="form-input" placeholder="Aula del Recu (opcional)">
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-sub" id="btnCancelRecu">Cancelar</button>
+            <button type="submit" class="btn-mini" style="background:var(--danger); color:#fff;">Crear Parcial Recu</button>
+          </div>
+        </form>
+
+        <!-- Lista de Tarjetas de Parciales -->
         <div class="exam-list" id="examList"></div>
       </div>
     </section>
 
-    <footer class="tip">// datos persistidos en tiempo real en localStorage</footer>
+    <footer class="tip">// tocá "Cargar Nota" para asentar tu calificación — se guardan en localStorage</footer>
   </div>
 
 </body>
