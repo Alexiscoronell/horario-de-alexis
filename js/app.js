@@ -3,9 +3,6 @@
 (function () {
   const { escapeHtml, parseTimeRange, rangesOverlap, getTodayName, delegate } = App;
 
-  // Única fuente de verdad: el horario. Los choques ya NO se marcan a mano
-  // (antes había un campo "conflict: true/false" que había que mantener
-  // sincronizado); se calculan solos comparando los horarios de cada día.
   const SCHEDULE = {
     "Lunes": [
       { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (T)", time: "12:00 – 14:00", room: "Lab. Fidel", desc: "Bloque teórico, mediodía." },
