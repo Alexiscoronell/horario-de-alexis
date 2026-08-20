@@ -5,7 +5,7 @@
 
   const SCHEDULE = {
     "Lunes": [
-      { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (T)", time: "12:00 – 14:00", room: "Lab. Fidel", desc: "Bloque teórico, mediodía." },
+      { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (T)", time: "12:00 – 14:00", room: "Lab. Fidel", desc: "Bloque teorico, mediodía." },
       { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (P)", time: "14:00 – 16:00", room: "Lab. Fidel", desc: "Práctica continua en laboratorio." },
       { code: "MA006", cls: "c-ma006", name: "Estadística (T/P)", time: "16:00 – 19:00", room: "Aula 13", desc: "Materia incorporada de 2° año." },
       { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (P)", time: "18:30 – 20:30", room: "Aula 3 anexo", desc: "Práctica de cierre del día lunes." }
