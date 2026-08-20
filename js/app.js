@@ -15,9 +15,9 @@
     ],
     "Martes": [],
     "Miércoles": [
-      { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (T)", time: "11:30 – 13:30", room: "Aula común", desc: "Teoría de Desarrollo de Software." },
+      { code: "IF012", cls: "c-if012", name: "Desarrollo de Software (virtual)", time: "11:30 – 13:30", room: "Aula común", desc: "consulta virtual de Desarrollo de Software." },
       { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (P)", time: "14:00 – 16:00", room: "Aula 103", desc: "Práctica de Fundamentos." },
-      { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (T)", time: "16:00 – 18:00", room: "Aula 103", desc: "Teoría de Fundamentos." }
+      { code: "IF013", cls: "c-if013", name: "Fundamentos Teóricos (T)", time: "16:00 – 17:00", room: "Aula 103", desc: "Teoría de Fundamentos." }
     ],
     "Jueves": [],
     "Viernes": [
